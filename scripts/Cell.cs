@@ -2,28 +2,47 @@ using Godot;
 using System;
 using System.Linq;
 
+/* TODO:
+	- [ ] Draws
+	- [~] Move to occupied grid
+	- [~] Grid winner
+*/
+
+
 public partial class Cell : Button
 {
 	[Export]
 	private Texture2D OTexture;
 	[Export]
 	private Texture2D XTexture;
+	[Export]
+	private PackedScene tileScene;
 
 	private GridContainer TTTR;
 	private TurnManager TurnMGR;
 	private TextureRect TurnIND;
+	private Label TurnCNT;
 
 	private static string[] checks = { "012", "345", "678", // Horizontal
 									   "036", "147", "258", // Vertical
 									   "048", "642", };     // Diagonal
 
+	public override void _Ready()
+	{
+		TurnMGR = GetNode<TurnManager>("/root/Root/TurnManager");
+		TurnIND = GetNode<TextureRect>("/root/Root/TurnIndicator");
+		TTTR = GetNode<GridContainer>("/root/Root/TTTR");
+		TurnCNT = GetNode<Label>("/root/Root/TurnCount");
+
+	}
+
 	private void advanceTurn()
 	{
 		this.Icon = TurnMGR.current ? XTexture : OTexture;
 		TurnIND.Texture = !TurnMGR.current ? XTexture : OTexture;
-
 		TurnMGR.current = !TurnMGR.current;
-		TurnMGR.counter += 1;
+
+		TurnCNT.Text = (Int32.Parse(TurnCNT.Text) + 1).ToString();
 
 		this.Disabled = true;
 	}
@@ -36,15 +55,25 @@ public partial class Cell : Button
 		);
 	}
 
+	private void switchAllGrids(bool state)
+	{
+		foreach (Node child in TTTR.GetChildren())
+		{
+			var cast = child as GridContainer;
+			if (cast != null)
+				switchGrid(cast, state);
+		}
+	}
+
 	private bool checkSmallWin()
 	{
-
+		GD.Print("Checking small");
 		var p = GetParent();
 		foreach (var check in checks)
 		{
-			var zero = p.GetNode<Cell>(check.Substr(0, 1)).Icon;
-			var one = p.GetNode<Cell>(check.Substr(1, 1)).Icon;
-			var two = p.GetNode<Cell>(check.Substr(2, 1)).Icon;
+			var zero = p.GetChild<Cell>(check[0] - '0').Icon;
+			var one = p.GetChild<Cell>(check[1] - '0').Icon;
+			var two = p.GetChild<Cell>(check[2] - '0').Icon;
 
 			if (zero != null && one != null && two != null
 				&& zero == one && one == two)
@@ -53,30 +82,72 @@ public partial class Cell : Button
 		return false;
 	}
 
+	private bool checkBigWin()
+	{
+		GD.Print("Checking Big");
+		foreach (var check in checks)
+		{
+			GD.Print(check);
+			var zero = TTTR.GetChild<Node>(check[0] - '0') as TextureRect;
+			var one = TTTR.GetChild<Node>(check[1] - '0') as TextureRect;
+			var two = TTTR.GetChild<Node>(check[2] - '0') as TextureRect;
+
+			if (zero != null && one != null && two != null
+					&& zero == one && one == two)
+				return true;
+		}
+		return false;
+	}
+
+	private void winThisGrid()
+	{
+		TextureRect tile = tileScene.Instantiate<TextureRect>();
+		tile.Texture = TurnMGR.current ? OTexture : XTexture;
+
+		var i = GetParent().GetIndex();
+
+		GetParent().QueueFree();
+
+		TTTR.AddChild(tile);
+		TTTR.MoveChild(tile, i);
+
+		tile.Name = i.ToString();
+	}
+
+	private void checkWins()
+	{
+		if (checkSmallWin())
+		{
+			winThisGrid();
+
+			if (checkBigWin())
+				GD.Print("YAAAAAAY");
+
+			var winner = TurnMGR.current ? "O" : "X";
+			GD.Print($"{winner} WIN! at {GetParent().Name}");
+		}
+	}
+
 	public override void _Pressed()
 	{
 		advanceTurn();
-		GridContainer nextMoveGrid = TTTR.GetNode<GridContainer>((string)this.Name);
+		GridContainer nextMoveGrid = TTTR.GetChild<Node>(this.GetIndex()) as GridContainer;
+		checkWins();
 
-		foreach (GridContainer child in TTTR.GetChildren().Cast<GridContainer>())
+		if (nextMoveGrid == null)
 		{
-			switchGrid(child, false);
+			switchAllGrids(true);
 		}
-
-		switchGrid(nextMoveGrid, true);
-
-		if (checkSmallWin())
-			GD.Print($"WIN! at {this.Name}");
-
-
+		else
+		{
+			switchAllGrids(false);
+			switchGrid(nextMoveGrid, true);
+		}
 	}
 
-	public override void _Ready()
-	{
-		TurnMGR = GetNode<TurnManager>("/root/Root/TurnManager");
-		TurnIND = GetNode<TextureRect>("/root/Root/TurnIndicator");
-		TTTR = GetNode<GridContainer>("/root/Root/TTTR");
-	}
+
+
+
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)

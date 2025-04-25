@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://cdne6jnrw6bwa"]
+
+[node name="WinTile" type="TextureRect"]
+custom_minimum_size = Vector2(200, 200)
+expand_mode = 1
