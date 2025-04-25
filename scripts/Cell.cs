@@ -4,8 +4,8 @@ using System.Linq;
 
 /* TODO:
 	- [ ] Draws
-	- [~] Move to occupied grid
-	- [~] Grid winner
+	- [X] Move to occupied grid
+	- [X] Grid winner
 */
 
 
@@ -67,7 +67,6 @@ public partial class Cell : Button
 
 	private bool checkSmallWin()
 	{
-		GD.Print("Checking small");
 		var p = GetParent();
 		foreach (var check in checks)
 		{
@@ -87,13 +86,12 @@ public partial class Cell : Button
 		GD.Print("Checking Big");
 		foreach (var check in checks)
 		{
-			GD.Print(check);
 			var zero = TTTR.GetChild<Node>(check[0] - '0') as TextureRect;
 			var one = TTTR.GetChild<Node>(check[1] - '0') as TextureRect;
 			var two = TTTR.GetChild<Node>(check[2] - '0') as TextureRect;
 
 			if (zero != null && one != null && two != null
-					&& zero == one && one == two)
+					&& zero.Texture == one.Texture && one.Texture == two.Texture)
 				return true;
 		}
 		return false;
@@ -145,11 +143,5 @@ public partial class Cell : Button
 			switchAllGrids(false);
 			switchGrid(nextMoveGrid, true);
 		}
-	}
-
-
-	public override void _Draw()
-	{
-
 	}
 }
