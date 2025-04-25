@@ -120,17 +120,20 @@ public partial class Cell : Button
 		{
 			winThisGrid();
 
-			if (checkBigWin())
-				GD.Print("YAAAAAAY");
-
 			var winner = TurnMGR.current ? "O" : "X";
 			GD.Print($"{winner} WIN! at {GetParent().Name}");
+
+			if (checkBigWin())
+				GD.Print("YAAAAAAY");
 		}
 	}
 
 	public override void _Pressed()
 	{
 		advanceTurn();
+		// FIXME: (-> -> Win) results in this getting grid reference
+		// 		  that's later destroyed in checkWins() resulting in
+		// 		  a hardlock
 		GridContainer nextMoveGrid = TTTR.GetChild<Node>(this.GetIndex()) as GridContainer;
 		checkWins();
 
