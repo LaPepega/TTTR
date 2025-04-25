@@ -105,11 +105,11 @@ public partial class Cell : Button
 		tile.Texture = TurnMGR.current ? OTexture : XTexture;
 
 		var i = GetParent().GetIndex();
-
 		GetParent().QueueFree();
 
 		TTTR.AddChild(tile);
 		TTTR.MoveChild(tile, i);
+		TTTR.MoveChild(GetParent(), 10);
 
 		tile.Name = i.ToString();
 	}
@@ -131,11 +131,10 @@ public partial class Cell : Button
 	public override void _Pressed()
 	{
 		advanceTurn();
-		// FIXME: (-> -> Win) results in this getting grid reference
-		// 		  that's later destroyed in checkWins() resulting in
-		// 		  a hardlock
-		GridContainer nextMoveGrid = TTTR.GetChild<Node>(this.GetIndex()) as GridContainer;
 		checkWins();
+
+		GridContainer nextMoveGrid = TTTR.GetChild<Node>(this.GetIndex()) as GridContainer;
+
 
 		if (nextMoveGrid == null)
 		{
@@ -149,11 +148,8 @@ public partial class Cell : Button
 	}
 
 
-
-
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
+	public override void _Draw()
 	{
+
 	}
 }
