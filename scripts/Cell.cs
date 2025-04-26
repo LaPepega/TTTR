@@ -102,7 +102,7 @@ public partial class Cell : Button
 			GD.Print("YAY");
 	}
 
-	private static bool IsGridAvailable(GridContainer grid)
+	private static bool GridAvailable(GridContainer grid)
 	{
 		if (grid == null)
 			return false;
@@ -124,7 +124,7 @@ public partial class Cell : Button
 		GridContainer nextMoveGrid = TTTR.GetChild<Node>(this.GetIndex()) as GridContainer;
 
 
-		if (IsGridAvailable(nextMoveGrid))
+		if (GridAvailable(nextMoveGrid))
 		{
 			SwitchAllGrids(false);
 			SwitchGrid(nextMoveGrid, true);
