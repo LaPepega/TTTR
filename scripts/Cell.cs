@@ -14,17 +14,14 @@ using System.Linq;
 
 public partial class Cell : Button
 {
-	[Export]
-	private Texture2D OTexture;
-	[Export]
-	private Texture2D XTexture;
+
 	[Export]
 	private PackedScene tileScene;
 
 	private GridContainer TTTR;
+
 	private TurnManager TurnMGR;
-	private TextureRect TurnIND;
-	private Label TurnCNT;
+
 
 	private static string[] checks = { "012", "345", "678", // Horizontal
 									   "036", "147", "258", // Vertical
@@ -33,21 +30,9 @@ public partial class Cell : Button
 	public override void _Ready()
 	{
 		TurnMGR = GetNode<TurnManager>("/root/Root/TurnManager");
-		TurnIND = GetNode<TextureRect>("/root/Root/TurnIndicator");
 		TTTR = GetNode<GridContainer>("/root/Root/TTTR");
-		TurnCNT = GetNode<Label>("/root/Root/TurnCount");
 
-	}
 
-	private void AdvanceTurn()
-	{
-		this.Icon = TurnMGR.current ? XTexture : OTexture;
-		TurnIND.Texture = !TurnMGR.current ? XTexture : OTexture;
-		TurnMGR.current = !TurnMGR.current;
-
-		TurnCNT.Text = (Int32.Parse(TurnCNT.Text) + 1).ToString();
-
-		this.Disabled = true;
 	}
 
 	private static void SwitchGrid(GridContainer grid, bool state)
@@ -104,7 +89,7 @@ public partial class Cell : Button
 	private void WinThisGrid()
 	{
 		TextureRect tile = tileScene.Instantiate<TextureRect>();
-		tile.Texture = TurnMGR.current ? OTexture : XTexture;
+		tile.Texture = TurnMGR.current ? TurnMGR.OTexture : TurnMGR.XTexture;
 
 		var i = GetParent().GetIndex();
 		GetParent().QueueFree();
@@ -146,7 +131,7 @@ public partial class Cell : Button
 
 	public override void _Pressed()
 	{
-		AdvanceTurn();
+		TurnMGR.AdvanceTurn(this);
 		CheckWins();
 
 		GridContainer nextMoveGrid = TTTR.GetChild<Node>(this.GetIndex()) as GridContainer;
