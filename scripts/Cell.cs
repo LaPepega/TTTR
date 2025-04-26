@@ -39,7 +39,7 @@ public partial class Cell : Button
 
 	}
 
-	private void advanceTurn()
+	private void AdvanceTurn()
 	{
 		this.Icon = TurnMGR.current ? XTexture : OTexture;
 		TurnIND.Texture = !TurnMGR.current ? XTexture : OTexture;
@@ -50,7 +50,7 @@ public partial class Cell : Button
 		this.Disabled = true;
 	}
 
-	private void switchGrid(GridContainer grid, bool state)
+	private static void SwitchGrid(GridContainer grid, bool state)
 	{
 		grid.PropagateCall("set_mouse_filter", new() {
 			state ? (int)Control.MouseFilterEnum.Pass
@@ -58,17 +58,18 @@ public partial class Cell : Button
 		);
 	}
 
-	private void switchAllGrids(bool state)
+	private void SwitchAllGrids(bool state)
 	{
 		foreach (Node child in TTTR.GetChildren())
 		{
 			var cast = child as GridContainer;
 			if (cast != null)
-				switchGrid(cast, state);
+				SwitchGrid(cast, state);
 		}
 	}
 
-	private bool checkSmallWin()
+	//FIXME: Repetition
+	private bool CheckSmallWin()
 	{
 		var p = GetParent();
 		foreach (var check in checks)
@@ -84,7 +85,7 @@ public partial class Cell : Button
 		return false;
 	}
 
-	private bool checkBigWin()
+	private bool CheckBigWin()
 	{
 		GD.Print("Checking Big");
 		foreach (var check in checks)
@@ -100,7 +101,7 @@ public partial class Cell : Button
 		return false;
 	}
 
-	private void winThisGrid()
+	private void WinThisGrid()
 	{
 		TextureRect tile = tileScene.Instantiate<TextureRect>();
 		tile.Texture = TurnMGR.current ? OTexture : XTexture;
@@ -115,21 +116,21 @@ public partial class Cell : Button
 		tile.Name = i.ToString();
 	}
 
-	private void checkWins()
+	private void CheckWins()
 	{
-		if (checkSmallWin())
-		{
-			winThisGrid();
+		if (!CheckSmallWin())
+			return;
 
-			var winner = TurnMGR.current ? "O" : "X";
-			GD.Print($"{winner} WIN! at {GetParent().Name}");
+		WinThisGrid();
 
-			if (checkBigWin())
-				GD.Print("YAAAAAAY");
-		}
+		var winner = TurnMGR.current ? "O" : "X";
+		GD.Print($"{winner} WIN! at {GetParent().Name}");
+
+		if (CheckBigWin())
+			GD.Print("YAAAAAAY");
 	}
 
-	private bool isGridAvailable(GridContainer grid)
+	private static bool IsGridAvailable(GridContainer grid)
 	{
 		if (grid == null)
 			return false;
@@ -145,20 +146,20 @@ public partial class Cell : Button
 
 	public override void _Pressed()
 	{
-		advanceTurn();
-		checkWins();
+		AdvanceTurn();
+		CheckWins();
 
 		GridContainer nextMoveGrid = TTTR.GetChild<Node>(this.GetIndex()) as GridContainer;
 
 
-		if (isGridAvailable(nextMoveGrid))
+		if (IsGridAvailable(nextMoveGrid))
 		{
-			switchAllGrids(false);
-			switchGrid(nextMoveGrid, true);
+			SwitchAllGrids(false);
+			SwitchGrid(nextMoveGrid, true);
 		}
 		else
 		{
-			switchAllGrids(true);
+			SwitchAllGrids(true);
 		}
 	}
 }
