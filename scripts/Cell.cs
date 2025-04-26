@@ -53,66 +53,53 @@ public partial class Cell : Button
 		}
 	}
 
-	//FIXME: Repetition
-	private bool CheckSmallWin()
+	//FIXME: Can totally be done better
+	private static bool RunChecks(GridContainer grid)
 	{
-		var p = GetParent();
 		foreach (var check in checks)
 		{
-			var zero = p.GetChild<Cell>(check[0] - '0').Icon;
-			var one = p.GetChild<Cell>(check[1] - '0').Icon;
-			var two = p.GetChild<Cell>(check[2] - '0').Icon;
+			if (grid.GetChild(check[0] - '0') is TextureRect zeroB && zeroB.Texture != null
+				&& grid.GetChild(check[1] - '0') is TextureRect oneB && oneB.Texture != null
+				&& grid.GetChild(check[2] - '0') is TextureRect twoB && twoB.Texture != null
+				&& zeroB.Texture == oneB.Texture && oneB.Texture == twoB.Texture)
+				return true;
 
-			if (zero != null && one != null && two != null
-				&& zero == one && one == two)
+			if (grid.GetChild(check[0] - '0') is Cell zeroS && zeroS.Icon != null
+				&& grid.GetChild(check[1] - '0') is Cell oneS && oneS.Icon != null
+				&& grid.GetChild(check[2] - '0') is Cell twoS && twoS.Icon != null
+				&& zeroS.Icon == oneS.Icon && oneS.Icon == twoS.Icon)
 				return true;
 		}
 		return false;
 	}
 
-	private bool CheckBigWin()
-	{
-		GD.Print("Checking Big");
-		foreach (var check in checks)
-		{
-			var zero = TTTR.GetChild<Node>(check[0] - '0') as TextureRect;
-			var one = TTTR.GetChild<Node>(check[1] - '0') as TextureRect;
-			var two = TTTR.GetChild<Node>(check[2] - '0') as TextureRect;
-
-			if (zero != null && one != null && two != null
-					&& zero.Texture == one.Texture && one.Texture == two.Texture)
-				return true;
-		}
-		return false;
-	}
-
-	private void WinThisGrid()
+	private void WinGrid(GridContainer grid)
 	{
 		TextureRect tile = tileScene.Instantiate<TextureRect>();
 		tile.Texture = TurnMGR.current ? TurnMGR.OTexture : TurnMGR.XTexture;
 
-		var i = GetParent().GetIndex();
-		GetParent().QueueFree();
+		var i = grid.GetIndex();
+		grid.QueueFree();
 
 		TTTR.AddChild(tile);
 		TTTR.MoveChild(tile, i);
-		TTTR.MoveChild(GetParent(), 10);
+		TTTR.MoveChild(grid, 10);
 
 		tile.Name = i.ToString();
 	}
 
 	private void CheckWins()
 	{
-		if (!CheckSmallWin())
+		if (!RunChecks(GetParent<GridContainer>()))
 			return;
 
-		WinThisGrid();
+		WinGrid(GetParent<GridContainer>());
 
 		var winner = TurnMGR.current ? "O" : "X";
 		GD.Print($"{winner} WIN! at {GetParent().Name}");
 
-		if (CheckBigWin())
-			GD.Print("YAAAAAAY");
+		if (RunChecks(TTTR))
+			GD.Print("YAY");
 	}
 
 	private static bool IsGridAvailable(GridContainer grid)
