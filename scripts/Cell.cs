@@ -17,6 +17,7 @@ public partial class Cell : Button
 	private static PackedScene tileScene;
 	private static GridContainer TTTR;
 	private static TurnManager TurnMGR;
+	private static TextureRect WinRect;
 
 	private static string[] checks = { "012", "345", "678", // Horizontal
 									   "036", "147", "258", // Vertical
@@ -27,6 +28,7 @@ public partial class Cell : Button
 		TurnMGR = GetNode<TurnManager>("/root/Root/TurnManager");
 		TTTR = GetNode<GridContainer>("/root/Root/TTTR");
 		tileScene = ResourceLoader.Load<PackedScene>("res://scenes/WinTile.tscn");
+		WinRect = GetNode<TextureRect>("/root/Root/WinRect");
 	}
 
 	private static void SwitchGrid(GridContainer grid, bool state)
@@ -93,7 +95,7 @@ public partial class Cell : Button
 		GD.Print($"{winner} WIN! at {GetParent().Name}");
 
 		if (RunChecks(TTTR))
-			GD.Print("YAY");
+			Win(TurnMGR.current);
 	}
 
 	private static bool GridAvailable(GridContainer grid)
@@ -110,6 +112,13 @@ public partial class Cell : Button
 		return false;
 	}
 
+	private void Win(bool who)
+	{
+		TTTR.Visible = false;
+		TurnMGR.TurnIND.Visible = false;
+		TurnMGR.TurnCNT.Visible = false;
+		WinRect.Texture = who ? TurnMGR.OTexture : TurnMGR.XTexture;
+	}
 	public override void _Pressed()
 	{
 		TurnMGR.AdvanceTurn(this);

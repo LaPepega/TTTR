@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://drlsmr5camb62"]
+[gd_scene load_steps=7 format=3 uid="uid://drlsmr5camb62"]
 
 [ext_resource type="Texture2D" uid="uid://ds75jdgutgs6k" path="res://sprites/X.png" id="1_0ssle"]
 [ext_resource type="PackedScene" uid="uid://4r0bys753pns" path="res://scenes/TickTackToe.tscn" id="1_645y1"]
 [ext_resource type="Script" path="res://scripts/TurnManager.cs" id="1_iluoj"]
+[ext_resource type="Texture2D" uid="uid://cp3gpqr647rrb" path="res://sprites/Restart.png" id="2_eh8po"]
 [ext_resource type="Texture2D" uid="uid://cj8f6rxt682ot" path="res://sprites/O.png" id="3_6ixlj"]
+[ext_resource type="Script" path="res://scripts/RestartButton.cs" id="3_xw4oa"]
 
 [node name="Root" type="Control"]
 layout_mode = 3
@@ -40,10 +42,37 @@ grow_horizontal = 2
 texture = ExtResource("1_0ssle")
 expand_mode = 1
 
+[node name="RestartButton" type="Button" parent="."]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 0
+offset_left = 620.0
+offset_top = 1168.0
+offset_right = 684.0
+offset_bottom = 1232.0
+icon = ExtResource("2_eh8po")
+flat = true
+expand_icon = true
+script = ExtResource("3_xw4oa")
+
 [node name="TurnManager" type="Timer" parent="."]
 script = ExtResource("1_iluoj")
 OTexture = ExtResource("3_6ixlj")
 XTexture = ExtResource("1_0ssle")
+
+[node name="WinRect" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -100.0
+offset_right = 100.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="TTTR" type="GridContainer" parent="."]
 layout_mode = 1
