@@ -14,14 +14,9 @@ using System.Linq;
 
 public partial class Cell : Button
 {
-
-	[Export]
-	private PackedScene tileScene;
-
-	private GridContainer TTTR;
-
-	private TurnManager TurnMGR;
-
+	private static PackedScene tileScene;
+	private static GridContainer TTTR;
+	private static TurnManager TurnMGR;
 
 	private static string[] checks = { "012", "345", "678", // Horizontal
 									   "036", "147", "258", // Vertical
@@ -31,8 +26,7 @@ public partial class Cell : Button
 	{
 		TurnMGR = GetNode<TurnManager>("/root/Root/TurnManager");
 		TTTR = GetNode<GridContainer>("/root/Root/TTTR");
-
-
+		tileScene = ResourceLoader.Load<PackedScene>("res://scenes/WinTile.tscn");
 	}
 
 	private static void SwitchGrid(GridContainer grid, bool state)
@@ -43,7 +37,7 @@ public partial class Cell : Button
 		);
 	}
 
-	private void SwitchAllGrids(bool state)
+	private static void SwitchAllGrids(bool state)
 	{
 		foreach (Node child in TTTR.GetChildren())
 		{
@@ -73,7 +67,7 @@ public partial class Cell : Button
 		return false;
 	}
 
-	private void WinGrid(GridContainer grid)
+	private static void WinGrid(GridContainer grid)
 	{
 		TextureRect tile = tileScene.Instantiate<TextureRect>();
 		tile.Texture = TurnMGR.current ? TurnMGR.OTexture : TurnMGR.XTexture;
