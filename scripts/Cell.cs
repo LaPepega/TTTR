@@ -3,7 +3,10 @@ using System;
 using System.Linq;
 
 /* TODO:
-	- [ ] Draws
+	- [X] Draws
+	- [ ] UI
+	- [ ] Active grid highlight
+	- [ ] Restart, menu, etc.
 	- [X] Move to occupied grid
 	- [X] Grid winner
 */
@@ -126,6 +129,20 @@ public partial class Cell : Button
 		}
 	}
 
+	private bool isGridAvailable(GridContainer grid)
+	{
+		if (grid == null)
+			return false;
+
+		foreach (Cell c in grid.GetChildren().Cast<Cell>())
+		{
+			if (c.Icon == null)
+				return true;
+		}
+
+		return false;
+	}
+
 	public override void _Pressed()
 	{
 		advanceTurn();
@@ -134,14 +151,14 @@ public partial class Cell : Button
 		GridContainer nextMoveGrid = TTTR.GetChild<Node>(this.GetIndex()) as GridContainer;
 
 
-		if (nextMoveGrid == null)
-		{
-			switchAllGrids(true);
-		}
-		else
+		if (isGridAvailable(nextMoveGrid))
 		{
 			switchAllGrids(false);
 			switchGrid(nextMoveGrid, true);
+		}
+		else
+		{
+			switchAllGrids(true);
 		}
 	}
 }
