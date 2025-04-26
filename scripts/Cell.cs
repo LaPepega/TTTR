@@ -81,9 +81,9 @@ public partial class Cell : Button
 		var i = grid.GetIndex();
 		grid.QueueFree();
 
-		TTTR.AddChild(tile);
-		TTTR.MoveChild(tile, i);
-		TTTR.MoveChild(grid, 10);
+		grid.GetParent().AddChild(tile);
+		grid.GetParent().MoveChild(tile, i);
+		grid.GetParent().MoveChild(grid, 10);
 
 		tile.Name = i.ToString();
 	}
